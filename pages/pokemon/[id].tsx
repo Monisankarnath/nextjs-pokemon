@@ -1,20 +1,44 @@
 import Link from "next/link";
 import styles from "../../styles/Details.module.css";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import LoadingPage from "../LoadingPage";
 
-export async function getServerSideProps({ params }: any) {
+export async function getStaticPaths() {
   const resp = await fetch(
-    `https://jherr-pokemon.s3.us-west-1.amazonaws.com/pokemon/${params.id}.json`
+    "https://jherr-pokemon.s3.us-west-1.amazonaws.com/index.json"
   );
+  const pokemon = await resp.json();
   return {
-    props: {
-      pokemon: await resp.json(),
-    },
+    paths: pokemon.map((pok: any) => ({
+      params: { id: pok.id.toString() },
+    })),
+    fallback: true,
   };
+}
+export async function getStaticProps({ params }: any) {
+  try {
+    const resp = await fetch(
+      `https://jherr-pokemon.s3.us-west-1.amazonaws.com/pokemon/${params.id}.json`
+    );
+    const response = await resp.json();
+    return {
+      props: {
+        pokemon: response,
+      },
+    };
+  } catch (error) {
+    return {
+      notFound: true,
+    };
+  }
 }
 
 const Details = ({ pokemon }: any) => {
-  if (!pokemon) return <div>loading ...</div>;
+  const router = useRouter();
+  if (router.isFallback) {
+    return <LoadingPage />;
+  }
   return (
     <div className={styles.container}>
       <Head>

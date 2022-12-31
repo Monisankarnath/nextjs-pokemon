@@ -7,7 +7,7 @@ type pokemon = {
   name: string;
   image: any;
 };
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const resp = await fetch(
     "https://jherr-pokemon.s3.us-west-1.amazonaws.com/index.json"
   );
