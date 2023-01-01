@@ -26,6 +26,7 @@ export async function getStaticProps({ params }: any) {
       props: {
         pokemon: response,
       },
+      revalidate: 30,
     };
   } catch (error) {
     return {
